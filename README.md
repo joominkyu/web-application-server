@@ -21,7 +21,8 @@
 * Files.readAllBytes(new File("./webapp" + tokens[1]).toPath()) 로 원하는 곳으로 보내준다.
 
 ### 요구사항 2 - get 방식으로 회원가입
-* 
+* url을 따로 저장후 get 요청부분만 따로 땐다.
+* get요청을 HttpRequestUtils.parseQueryString 를 사용해 user객체에 저장한다.
 
 ### 요구사항 3 - post 방식으로 회원가입
 * 

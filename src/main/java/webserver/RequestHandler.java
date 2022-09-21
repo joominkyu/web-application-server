@@ -4,9 +4,12 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Map;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -31,14 +34,26 @@ public class RequestHandler extends Thread {
                 return;
             }
             String[] tokens = line.split(" ");
+            //url 부분 저장
+            String url = tokens[1];
 
             while (!line.equals("")){
                 line = br.readLine();
                 log.debug("header : {}",line);
             }
             DataOutputStream dos = new DataOutputStream(out);
+            //url 요청이 user/create 로 시작할경우 회원가입 시작
+            if(url.startsWith("/user/create")){
+                int index = url.indexOf("?");
+                //쿼리스트링 부분(get 요청부분) 을 따로 저장
+                String queryString = url.substring(index+1);
+                //get요청을 HttpRequestUtils.parseQueryString를 이용해 user 객체에 저장
+                Map<String,String> params = HttpRequestUtils.parseQueryString(queryString);
+                User user = new User(params.get("userId"),params.get("password"),params.get("name"),params.get("email"));
+                log.debug("user : {}",user);
+            }
             // 요청한 url 로 이동
-            byte[] body = Files.readAllBytes(new File("./webapp" + tokens[1]).toPath());
+            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 
             response200Header(dos, body.length);
             responseBody(dos, body);
