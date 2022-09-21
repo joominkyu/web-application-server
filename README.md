@@ -15,7 +15,10 @@
 * 각 요구사항을 구현하는 것이 중요한 것이 아니라 구현 과정을 통해 학습한 내용을 인식하는 것이 배움에 중요하다. 
 
 ### 요구사항 1 - http://localhost:8080/index.html로 접속시 응답
-* 
+* connection.getInputStream 로 url 요청을 읽는다.
+* BufferedReader 로 해당 요청을 읽은뒤 br.readLine()로 요청을 확인
+* GET index.html HTTP/1.1 식을 나누어 원하는 index.html 만 얻는다.(token[1])
+* Files.readAllBytes(new File("./webapp" + tokens[1]).toPath()) 로 원하는 곳으로 보내준다.
 
 ### 요구사항 2 - get 방식으로 회원가입
 * 
