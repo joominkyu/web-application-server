@@ -29,7 +29,7 @@ public class RequestHandler extends Thread {
             // url 요청을 읽음
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line = br.readLine();
-            log.debug("request line : {}",line);
+//            log.debug("request line : {}",line);
 
             if(line == null){
                 return;
@@ -41,7 +41,7 @@ public class RequestHandler extends Thread {
 
             while (!line.equals("")){
                 line = br.readLine();
-                log.debug("header : {}",line);
+//                log.debug("header : {}",line);
                 //본문의 길이 구하기
                 if(line.contains("Content-Length")){
                     contentLength = getContentLength(line);
@@ -59,16 +59,22 @@ public class RequestHandler extends Thread {
                     queryString = url.substring(index+1);
                 }
 
-                //post,get요청을 HttpRequestUtils.parseQueryString를 이용해 user 객체에 저장
+                //post,get 요청을 HttpRequestUtils.parseQueryString를 이용해 user 객체에 저장
                 Map<String,String> params = HttpRequestUtils.parseQueryString(queryString);
                 User user = new User(params.get("userId"),params.get("password"),params.get("name"),params.get("email"));
                 log.debug("user : {}",user);
-            }
-            // 요청한 url 로 이동
-            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
 
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+                response302Header(dos,"/index.html");
+            //회원 가입이 아닌 url 의 경우
+            }else{
+                log.debug(url);
+                // 요청한 url 로 이동
+                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -79,6 +85,21 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 요청 후 redirect
+     * @param dos
+     * @param url 보낼 url
+     */
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Redirect OK \r\n");
+            dos.writeBytes("Location: " + url + "  \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());

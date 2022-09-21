@@ -31,7 +31,11 @@
 * HttpRequestUtils.parseQueryString 를 사용해 user 객체에 저장한다.
 
 ### 요구사항 4 - redirect 방식으로 이동
-* 
+* 그냥 url 경로를 붙여주면 요청을 계속하므로 요청후 302 응답이 왔을때 redirect 시켜줌
+* dos.writeBytes("HTTP/1.1 302 Redirect OK \r\n");
+* dos.writeBytes("Location: " + url + "  \r\n");
+* dos.writeBytes("\r\n");
+* 정확하게 입력하지 않을경우 redirect 안됨..
 
 ### 요구사항 5 - cookie
 * 
