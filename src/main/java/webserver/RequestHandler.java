@@ -10,6 +10,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -34,20 +35,31 @@ public class RequestHandler extends Thread {
                 return;
             }
             String[] tokens = line.split(" ");
+            int contentLength = 0;
             //url 부분 저장
             String url = tokens[1];
 
             while (!line.equals("")){
                 line = br.readLine();
                 log.debug("header : {}",line);
+                //본문의 길이 구하기
+                if(line.contains("Content-Length")){
+                    contentLength = getContentLength(line);
+                }
             }
             DataOutputStream dos = new DataOutputStream(out);
             //url 요청이 user/create 로 시작할경우 회원가입 시작
             if(url.startsWith("/user/create")){
-                int index = url.indexOf("?");
-                //쿼리스트링 부분(get 요청부분) 을 따로 저장
-                String queryString = url.substring(index+1);
-                //get요청을 HttpRequestUtils.parseQueryString를 이용해 user 객체에 저장
+                String queryString;
+                if("/user/create".equals(url)){ //POST 요청일 경우
+                    queryString  = IOUtils.readData(br,contentLength);
+                }else{ //GET 요청일 경우
+                    //쿼리스트링 부분(get 요청부분) 을 따로 저장
+                    int index = url.indexOf("?");
+                    queryString = url.substring(index+1);
+                }
+
+                //post,get요청을 HttpRequestUtils.parseQueryString를 이용해 user 객체에 저장
                 Map<String,String> params = HttpRequestUtils.parseQueryString(queryString);
                 User user = new User(params.get("userId"),params.get("password"),params.get("name"),params.get("email"));
                 log.debug("user : {}",user);
@@ -80,5 +92,15 @@ public class RequestHandler extends Thread {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    /**
+     * post-header 본문 내용 길이구하기
+     * @param line 본문 길이의 정보 ex) Context-Length : 23
+     * @return number
+     */
+    private int getContentLength(String line){
+        String[] headerTokens =line.split(":");
+        return Integer.parseInt(headerTokens[1].trim());
     }
 }

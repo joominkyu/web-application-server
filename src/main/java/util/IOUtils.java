@@ -5,6 +5,7 @@ import java.io.IOException;
 
 public class IOUtils {
     /**
+     * post-header 본문내용 읽기
      * @param BufferedReader는
      *            Request Body를 시작하는 시점이어야
      * @param contentLength는
