@@ -149,6 +149,12 @@ public class RequestHandler extends Thread {
         return Integer.parseInt(headerTokens[1].trim());
     }
 
+    /**
+     * 요청 url 로 이동
+     * @param out
+     * @param url
+     * @throws IOException
+     */
     private void responseResource(OutputStream out, String url) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
         byte[] body = Files.readAllBytes(new File("./webapp"+url).toPath());
@@ -156,6 +162,10 @@ public class RequestHandler extends Thread {
         responseBody(dos,body);
     }
 
+    /**
+     * 로그인 성공시 302 redirect
+     * @param dos
+     */
     private void response302LoginSuccessHeader(DataOutputStream dos){
         try {
             dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
@@ -167,6 +177,11 @@ public class RequestHandler extends Thread {
         }
     }
 
+    /**
+     * 로그인 확인
+     * @param line 쿠키값
+     * @return
+     */
     private boolean isLogin(String line){
         String[] headerTokens = line.split(":");
         Map<String,String> cookie = HttpRequestUtils.parseCookies(headerTokens[1].trim());
