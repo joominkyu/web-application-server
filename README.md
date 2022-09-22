@@ -38,7 +38,8 @@
 * 정확하게 입력하지 않을경우 redirect 안됨..
 
 ### 요구사항 5 - cookie
-* 
+* DataOutputStream 의 writeBytes를 사용해 Cookie 값 주기.
+* 이부분은 이해가 좀 더 필요하다...
 
 ### 요구사항 6 - stylesheet 적용
 * 
