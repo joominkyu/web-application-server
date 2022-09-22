@@ -76,15 +76,15 @@ public class RequestHandler extends Thread {
                 } else {
                     responseResource(out, "/user/login_failed.html");
                 }
-            }else if("/user/list".equals(url)){
-                if(!logined){
-                    responseResource(out,"/user/login.html");
+            }else if("/user/list".equals(url)) {
+                if (!logined) {
+                    responseResource(out, "/user/login.html");
                     return;
                 }
                 Collection<User> users = DataBase.findAll();
                 StringBuilder sb = new StringBuilder();
                 sb.append("<table border='1'>");
-                for(User user:users){
+                for (User user : users) {
                     sb.append("<tr>");
                     sb.append("<td>").append(user.getUserId()).append("</td>");
                     sb.append("<td>").append(user.getName()).append("</td>");
@@ -94,6 +94,10 @@ public class RequestHandler extends Thread {
                 sb.append("</table>");
                 byte[] body = sb.toString().getBytes();
                 response200Header(dos, body.length);
+                responseBody(dos, body);
+            }else if(url.endsWith(".css")){
+                byte[] body = Files.readAllBytes(new File("./webapp"+url).toPath());
+                response200CssHeader(dos, body.length);
                 responseBody(dos,body);
             }else{
                 responseResource(out,url);
@@ -190,5 +194,21 @@ public class RequestHandler extends Thread {
             return false;
         }
         return Boolean.parseBoolean(value);
+    }
+
+    /**
+     * Css 적용 요청성공응답
+     * @param dos
+     * @param lengthOfBodyContent
+     */
+    private void response200CssHeader(DataOutputStream dos,int lengthOfBodyContent){
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css\r\n");
+            dos.writeBytes("Content-Length: "+ lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        }catch (IOException e){
+            log.error(e.getMessage());
+        }
     }
 }
